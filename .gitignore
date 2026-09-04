@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+config.json
+data/
+global_site/
+.pnpm-store/
+.DS_Store

@@ -1,0 +1,23 @@
+{
+  "broker_connected": false,
+  "broker": "Public-safe verified snapshot",
+  "started_at": "2026-09-04T20:42:59+08:00",
+  "projects": {
+    "INOUT": {
+      "topic": "inout", "expected_period_s": 1, "timeout_s": 5,
+      "received": 62, "valid": 62, "invalid": 0, "gaps": 0,
+      "last_received": "2026-09-04T20:44:00+08:00", "last_epoch": 0,
+      "last_payload": {"f": 535654, "s": 0, "i": 389, "o": 385, "e": 0, "id": "0INOUT-••••60"},
+      "raw_payload": "", "health": 100, "status": "VERIFIED", "age_s": null,
+      "history": [{"health":100},{"health":100},{"health":100},{"health":100},{"health":100}], "events": []
+    },
+    "HEIGHT": {
+      "topic": "height", "expected_period_s": 1, "timeout_s": 5,
+      "received": 62, "valid": 62, "invalid": 0, "gaps": 0,
+      "last_received": "2026-09-04T20:44:01+08:00", "last_epoch": 0,
+      "last_payload": {"id":"0HEIGHT-••90","install_loc":"","fn":857032,"s":"W","h_cm":null,"h_max_cm":null,"raw_h_at_max_cm":null,"raw_h_cm":null},
+      "raw_payload": "", "health": 100, "status": "VERIFIED", "age_s": null,
+      "history": [{"health":100},{"health":100},{"health":100},{"health":100},{"health":100}], "events": []
+    }
+  }
+}

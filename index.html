@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MQTT INOUT + HEIGHT Overnight Robustness Viewer V04 2026.09.04 22:30</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header><div><p class="eyebrow">JOYBIEN · REAL MQTT OBSERVABILITY</p><h1>MQTT Overnight <span>Robustness Viewer</span></h1><p class="subtitle">INOUT + HEIGHT 真實 Payload 夜間穩定性監控</p></div><div class="live"><i></i><b id="brokerState">連線中</b><small id="clock">--</small></div></header>
+  <section class="summary"><div><small>BROKER</small><b id="broker">--</b></div><div><small>SESSION</small><b id="duration">--</b></div><div><small>MESSAGES</small><b id="total">0</b></div><div><small>FAILURES</small><b id="failures">0</b></div></section>
+  <section class="projects" id="projects"></section>
+  <section class="panel chart-panel"><div class="section-title"><div><small>ROLLING HEALTH</small><h2>健康指數動態曲線</h2></div><div class="legend"><span class="inout">INOUT</span><span class="height">HEIGHT</span></div></div><canvas id="chart" height="240"></canvas></section>
+  <section class="lower"><div class="panel"><div class="section-title"><div><small>OVERNIGHT STATISTICS</small><h2>即時統計</h2></div></div><div id="stats"></div></div><div class="panel"><div class="section-title"><div><small>EVENT HISTORY</small><h2>故障記錄</h2></div><div><button id="loadHistory">載入 JSONL</button> <button id="playback" disabled>▶ 回放</button></div><input id="historyFile" type="file" accept=".jsonl,.json" hidden></div><div id="events" class="events"><p>目前沒有故障事件</p></div></div></section>
+  <footer><span>本工具只訂閱 MQTT；UART 由 INOUT 與 HEIGHT 韌體各自擁有。</span><a href="docs/qa_mqtt_progress_daily_digest.html">QA Progress →</a></footer>
+</main>
+<script src="app.js"></script>
+</body></html>
