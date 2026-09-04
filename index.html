@@ -2,13 +2,13 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MQTT INOUT + HEIGHT Real-Time Robustness Viewer V09 2026.09.04 23:08</title>
-<link rel="stylesheet" href="style.css?v=09">
+<title>MQTT INOUT + HEIGHT Real-Time Robustness Viewer V11 2026.09.04 23:20</title>
+<link rel="stylesheet" href="style.css?v=11">
 <style>.snapshot-info{grid-column:1/-1;border-top:1px solid var(--line);margin-top:7px;padding-top:8px;display:flex;gap:14px;color:var(--muted);font-size:11px}.snapshot-info[hidden]{display:none}.snapshot-info b{color:var(--yellow);font:700 11px ui-monospace,monospace}.notice{position:fixed;z-index:10;right:3vw;top:18px;padding:12px 16px;border:1px solid var(--line);border-radius:10px;background:#112238;box-shadow:0 12px 30px #0008;font-weight:800}.notice.ok{color:var(--green)}.notice.warn{color:var(--yellow)}.notice.bad{color:var(--red)}</style>
 </head>
 <body>
 <main>
-  <header><div><p class="eyebrow">JOYBIEN · REAL MQTT OBSERVABILITY</p><h1>MQTT Overnight <span>Robustness Viewer</span></h1><p class="subtitle">INOUT + HEIGHT 真實 Payload 夜間穩定性監控</p></div><div class="live"><i></i><b id="brokerState">連線中</b><small id="clock">--</small><div id="snapshotInfo" class="snapshot-info" hidden><span>最後快照 <b id="snapshotTime">--</b></span><span>下次檢查 <b id="snapshotCountdown">01:00</b></span></div></div></header>
+  <header><div><p class="eyebrow">JOYBIEN · REAL MQTT OBSERVABILITY · V11</p><h1>MQTT Overnight <span>Robustness Viewer</span></h1><p class="subtitle">INOUT + HEIGHT 真實 Payload 夜間穩定性監控</p></div><div class="live"><i></i><b id="brokerState">連線中</b><small id="clock">--</small><div id="snapshotInfo" class="snapshot-info" hidden><span>最後快照 <b id="snapshotTime">--</b></span><span>快照週期 <b>05:00</b></span><span>下次檢查 <b id="snapshotCountdown">00:30</b></span></div></div></header>
   <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
   <section class="summary"><div><small>BROKER</small><b id="broker">--</b></div><div><small>SESSION</small><b id="duration">--</b></div><div><small>MESSAGES</small><b id="total">0</b></div><div><small>FAILURES</small><b id="failures">0</b></div></section>
   <section class="projects" id="projects"></section>
@@ -17,5 +17,5 @@
   <section class="lower"><div class="panel"><div class="section-title"><div><small>OVERNIGHT STATISTICS</small><h2>即時統計</h2></div></div><div id="stats"></div></div><div class="panel"><div class="section-title"><div><small>EVENT HISTORY</small><h2>故障記錄</h2></div><div><button id="loadHistory">載入 JSONL</button> <button id="playback" disabled>▶ 回放</button></div><input id="historyFile" type="file" accept=".jsonl,.json" hidden></div><div id="events" class="events"><p>目前沒有故障事件</p></div></div></section>
   <footer><span>本工具只訂閱 MQTT；UART 由 INOUT 與 HEIGHT 韌體各自擁有。</span><a href="docs/qa_mqtt_progress_daily_digest.html">QA Progress →</a></footer>
 </main>
-<script src="app.js?v=09"></script>
+<script src="app.js?v=11"></script>
 </body></html>
