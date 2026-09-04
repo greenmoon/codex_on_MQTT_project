@@ -2,7 +2,7 @@
   "broker": "YOUR_MQTT_BROKER",
   "port": 1883,
   "projects": {
-    "INOUT": {"topic": "inout", "expected_period_s": 1, "timeout_s": 5},
-    "HEIGHT": {"topic": "height", "expected_period_s": 1, "timeout_s": 5}
+    "INOUT": {"topic": "inout", "frame_key": "f", "expected_period_s": 1, "timeout_s": 5},
+    "HEIGHT": {"topic": "height", "frame_key": "fn", "expected_period_s": 1, "timeout_s": 5}
   }
 }

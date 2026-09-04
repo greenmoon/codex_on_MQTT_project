@@ -9,7 +9,6 @@ import struct
 import threading
 import time
 import uuid
-from collections import deque
 from datetime import datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -80,8 +79,12 @@ def recv_packet(sock):
 def initial_project(spec):
     return {
         "topic": spec["topic"], "expected_period_s": spec["expected_period_s"],
-        "timeout_s": spec["timeout_s"], "received": 0, "valid": 0,
+        "timeout_s": spec["timeout_s"], "frame_key": spec["frame_key"],
+        "received": 0, "valid": 0,
         "invalid": 0, "gaps": 0, "last_received": None, "last_epoch": 0,
+        "last_frame": None, "frame_delta": None, "interval_ms": None,
+        "frame_checks": 0, "frame_advanced": 0, "stalls": 0,
+        "rollbacks": 0, "consecutive_stalls": 0, "stall_active": False,
         "last_payload": None, "raw_payload": "等待第一筆真實 MQTT payload",
         "health": 0, "status": "WAITING", "history": [], "events": []
     }
@@ -94,8 +97,9 @@ def health(project, current=None):
     age = current - project["last_epoch"]
     continuity = max(0, 100 - max(0, age - project["expected_period_s"] * 2) * 25)
     validity = project["valid"] / project["received"] * 100
-    gap_score = max(0, 100 - project["gaps"] * 5)
-    return round(continuity * .45 + validity * .35 + gap_score * .20)
+    frame_score = project["frame_advanced"] / project["frame_checks"] * 100 if project["frame_checks"] else 100
+    gap_score = max(0, 100 - project["gaps"] * 5 - project["rollbacks"] * 20)
+    return round(continuity * .35 + validity * .25 + frame_score * .30 + gap_score * .10)
 
 
 def record_message(project_name, topic, payload_bytes):
@@ -106,29 +110,61 @@ def record_message(project_name, topic, payload_bytes):
         valid = isinstance(decoded, dict)
     except json.JSONDecodeError:
         decoded, valid = None, False
+    event = None
     with LOCK:
         project = STATE["projects"][project_name]
         current = time.time()
         if project["last_epoch"]:
             delta = current - project["last_epoch"]
+            project["interval_ms"] = round(delta * 1000)
             if delta > project["expected_period_s"] * 2.5:
                 project["gaps"] += max(1, round(delta / project["expected_period_s"]) - 1)
+        frame = decoded.get(project["frame_key"]) if valid else None
+        frame_valid = isinstance(frame, int) and not isinstance(frame, bool) and frame >= 0
+        valid = valid and frame_valid
+        if frame_valid:
+            previous = project["last_frame"]
+            project["frame_delta"] = None if previous is None else frame - previous
+            if previous is not None:
+                project["frame_checks"] += 1
+                if frame > previous:
+                    project["frame_advanced"] += 1
+                    project["consecutive_stalls"] = 0
+                    project["stall_active"] = False
+                elif frame == previous:
+                    project["stalls"] += 1
+                    project["consecutive_stalls"] += 1
+                    if project["consecutive_stalls"] >= 3 and not project["stall_active"]:
+                        project["stall_active"] = True
+                        event = {"at": received_at, "project": project_name, "type": "frame_stalled",
+                                 "severity": "critical", "frame_key": project["frame_key"], "frame": frame}
+                else:
+                    project["rollbacks"] += 1
+                    project["consecutive_stalls"] = 0
+                    event = {"at": received_at, "project": project_name, "type": "frame_rollback",
+                             "severity": "critical", "frame_key": project["frame_key"],
+                             "previous": previous, "frame": frame}
+            project["last_frame"] = frame
         project["received"] += 1
         project["valid" if valid else "invalid"] += 1
         project["last_received"], project["last_epoch"] = received_at, current
         project["last_payload"], project["raw_payload"] = decoded, raw
         project["health"] = health(project, current)
         project["status"] = "HEALTHY" if project["health"] >= 90 else "WARNING" if project["health"] >= 75 else "UNHEALTHY"
-        project["history"].append({"t": received_at, "health": project["health"]})
+        project["history"].append({"t": received_at, "health": project["health"],
+                                   "frame_delta": project["frame_delta"], "interval_ms": project["interval_ms"]})
         project["history"] = project["history"][-300:]
     record = {"received_at": received_at, "project": project_name, "topic": topic,
               "payload_raw": raw, "payload": decoded, "valid": valid}
     write_jsonl("raw_messages.jsonl", record)
-    if not valid:
-        event = {"at": received_at, "project": project_name, "type": "invalid_json", "severity": "critical", "raw": raw}
+    if not valid and event is None:
+        event = {"at": received_at, "project": project_name, "type": "invalid_payload", "severity": "critical", "raw": raw}
+    if event:
         write_jsonl("failure_events.jsonl", event)
         with LOCK:
-            STATE["projects"][project_name]["events"].append(event)
+            events = STATE["projects"][project_name]["events"]
+            events.append(event)
+            del events[:-100]
 
 
 def mqtt_worker(config):
